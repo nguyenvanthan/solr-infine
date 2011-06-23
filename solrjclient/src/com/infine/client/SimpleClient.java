@@ -8,16 +8,20 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 import java.util.StringTokenizer;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthPolicy;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.auth.CredentialsProvider;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -31,15 +35,18 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.CoreAdminParams;
+import org.apache.solr.util.DateMathParser;
 import org.junit.Test;
 
 import com.infine.data.Cours;
 import com.infine.data.Portefeuille;
 import com.infine.data.Stock;
 
+import static org.junit.Assert.*;
+
 public class SimpleClient {
 	
-	//private static final String LOCALHOST_SOLR = "http://192.168.56.101:8983/solr";
+//	private static final String LOCALHOST_SOLR = "http://192.168.56.101:8983/solr";
 	private static final String LOCALHOST_SOLR = "http://localhost:8983/solr";
 
 	private static int MAX_ROWS = 1000000;
@@ -173,16 +180,15 @@ public class SimpleClient {
 	public void deleteAll(){
 		try {
 //			HttpClient client = new HttpClient();
-//            AuthScope scope = new AuthScope("localhost",8983,null);
-//            //client.getState().setCredentials(scope,new UsernamePasswordCredentials("userbasic", "basic"));
+//            AuthScope scope = new AuthScope(AuthScope.ANY_HOST,AuthScope.ANY_PORT,AuthScope.ANY_REALM);
+//            client.getState().setCredentials(scope,new UsernamePasswordCredentials("guest", "guest"));
 //            client.getParams().setAuthenticationPreemptive(true);
 //			List<String> authPrefs = new ArrayList<String>();
 //			authPrefs.add(AuthPolicy.BASIC);
 //			client.getParams().setParameter(AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs);
-//			client.getParams().setParameter("j_username", "userbasic");
-//			client.getParams().setParameter("j_password", "basic");
+//			AuthScope scope = new AuthScope("localhost", 8983, AuthScope.ANY_REALM);
 //			client.getState().setCredentials(scope, new	UsernamePasswordCredentials("useradmin", "admin"));
-			
+//			CommonsHttpSolrServer solr = new CommonsHttpSolrServer("http://localhost:8983/solr",client);
 			CommonsHttpSolrServer solr = new CommonsHttpSolrServer(LOCALHOST_SOLR);
 			String deleteQuery = "*:*";
 			UpdateResponse response = null;
@@ -339,9 +345,9 @@ public class SimpleClient {
 	}
 	
 	@Test
-	public void feedIndexCore1(){
+	public void feedIndexCours(){
 		try {
-			CommonsHttpSolrServer solr = new CommonsHttpSolrServer("http://localhost:8983/solr/core1");
+			CommonsHttpSolrServer solr = new CommonsHttpSolrServer( LOCALHOST_SOLR);
 			List<Cours> listeCours = generateCoursList();
 			int index = 0;
 			int buffer = 10000;
@@ -372,6 +378,74 @@ public class SimpleClient {
 			
 	}
 	
+	@Test
+	public void feedIndexCoursCore1(){
+		try {
+			CommonsHttpSolrServer solr = new CommonsHttpSolrServer( LOCALHOST_SOLR + "/core1");
+			List<Cours> listeCours = generateCoursList();
+			int index = 0;
+			int buffer = 10000;
+			int nbcours = listeCours.size();
+			long start = System.nanoTime();
+			List<Cours> tempList = null;
+			while (index + buffer < nbcours){
+				tempList = listeCours.subList(index, index=index+buffer);
+				solr.addBeans(tempList);
+				System.out.print(".");
+			}
+			// ici il doit en rester moins que le buffer
+			if (index != nbcours -1){
+				tempList = listeCours.subList(index, nbcours-1);
+				solr.addBeans(tempList);
+				System.out.print(".");
+			}
+			// enfin on commit
+			solr.commit();
+			
+			long tempsExecution = System.nanoTime() - start;
+			printTime(tempsExecution);
+		} catch (SolrServerException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+			
+	}
+	
+	
+	@Test
+	public void feedStockIndexCore0(){
+		try {
+			CommonsHttpSolrServer solr = new CommonsHttpSolrServer(LOCALHOST_SOLR +  "/core0");
+			List<Stock> listeStocks = generateStockList();
+			int buffer = 1000;
+			int nbstocks = listeStocks.size();
+			System.out.println("Nombre d'objets : "+nbstocks);
+			long start = System.nanoTime();
+			List<Stock> tempList = null;
+			while (listeStocks != null && listeStocks.size() > 0){
+				int max = listeStocks.size();
+				if (buffer < max){
+					tempList = listeStocks.subList(0, buffer);
+				}else {
+					tempList = listeStocks.subList(0, max);
+				}
+				solr.addBeans(tempList);
+				tempList.clear();
+				System.out.print(".");
+			}
+			
+			// enfin on commit
+			solr.commit();
+			
+			long tempsExecution = System.nanoTime() - start;
+			printTime(tempsExecution);
+		} catch (SolrServerException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	@Test
 	public void feedStockIndex(){
@@ -405,6 +479,15 @@ public class SimpleClient {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Test
+	public void stressTestFeedStockIndex(){
+		int max = 20;
+		for (int i = 0; i < max; i++) {
+			feedStockIndex();
+		}
+		System.out.println("FINISH !!!");
 	}
 	
 	@Test
@@ -578,6 +661,9 @@ public class SimpleClient {
 					count++;
 				}
 			}
+			reader.close();
+			writer.flush();
+			writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -628,11 +714,9 @@ public class SimpleClient {
 		newInstance.setCategory(colArray[0]);
 		newInstance.setIsin(colArray[1]);
 		newInstance.setTime(colArray[2]);
-		newInstance.setId(newInstance.getIsin() +"-"+ colArray[3]);
+		newInstance.setComposedId(colArray[1]);
 		newInstance.setPrice(Float.parseFloat(colArray[4]));
 		newInstance.setQuantity(Integer.parseInt(colArray[5]));
-		newInstance.setUser(colArray[6]);
-		newInstance.setGroup(colArray[7]);
 		
 		return newInstance;
 	}
@@ -727,8 +811,7 @@ public class SimpleClient {
 		System.out.println(test.getId());
 		System.out.println(test.getPrice());
 		System.out.println(test.getQuantity());
-		System.out.println(test.getUser());
-		System.out.println(test.getGroup());
+
 	}
 
 	@Test
@@ -743,4 +826,28 @@ public class SimpleClient {
 		printTime(tempsExecution);
 	}
 	
+	
+	@Test
+	public void testDate(){
+		DateMathParser p = new DateMathParser( TimeZone.getTimeZone("GMT+01:00"), Locale.ENGLISH);
+		try {
+			/*
+			 Map<String, Integer> m = DateMathParser.CALENDAR_UNITS;
+			for (Map.Entry<String, Integer> entry : m.entrySet()) {
+				System.out.println(entry.getKey() + ":" + entry.getValue());
+			}
+			 */
+			Date d = p.parseMath("+7DAYS");
+			System.out.println(d);
+		} catch (ParseException e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+	
+	@Test
+	public void testPattern(){
+		String test = "gap-1321";
+		System.out.println(test.matches("\\d.+"));
+	}
 }

@@ -38,12 +38,6 @@ public class Stock extends UserData{
 	@Field
 	private String secteur; //FIXED LINE TELECOMMUNICATIONS
 	
-	@Field
-	private String users;
-	
-	@Field
-	private String groups;
-
 	
 	public void setComposedId(String id){
 		this.id = PREFIX_ID_VALEUR + id;

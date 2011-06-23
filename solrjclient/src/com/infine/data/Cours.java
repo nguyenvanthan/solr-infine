@@ -2,34 +2,40 @@ package com.infine.data;
 
 import org.apache.solr.client.solrj.beans.Field;
 
-public class Cours {
+public class Cours{
+	
+	
+	private static final String TECHNICAL_TYPE = "cours";
+	private static final String PREFIX_ID_VALEUR = TECHNICAL_TYPE + "-";
+	
 	
 	//"category","isin","time","id","price","quantity","user","group"
 
 	
 	@Field
-	String id;
+	private String id;
+	
+	@Field
+	private String type = TECHNICAL_TYPE; // ici donnee custom --> c'est un type technique
 
 	@Field
-	String category;
+	private String category;
 
 	@Field
-	String isin;
+	private String isin;
 	
 	@Field
-	String time;
+	private String time;
 	
 	@Field
-	float price;
+	private float price;
 	
 	@Field
-	int quantity;
+	private int quantity;
 	
-	@Field
-	String user;
-	
-	@Field
-	String group;
+	public void setComposedId(String id){
+		this.id = PREFIX_ID_VALEUR + id;
+	}
 
 	public String getId() {
 		return id;
@@ -37,6 +43,14 @@ public class Cours {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	public String getCategory() {
@@ -78,22 +92,5 @@ public class Cours {
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
-
-	public String getUser() {
-		return user;
-	}
-
-	public void setUser(String user) {
-		this.user = user;
-	}
-
-	public String getGroup() {
-		return group;
-	}
-
-	public void setGroup(String group) {
-		this.group = group;
-	}
-
-
+	
 }
