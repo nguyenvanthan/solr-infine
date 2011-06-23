@@ -1,0 +1,25 @@
+
+#set($field = $response.response.facet_counts.facet_dates.datenews)
+#*
+#set($start = $response.response.facet_counts.facet_dates.datenews.start)
+#set($end = $response.response.facet_counts.facet_dates.datenews.end)
+#set($gap = $response.response.facet_counts.facet_dates.datenews.gap)
+#set($before = $response.response.facet_counts.facet_dates.datenews.before)
+*#
+
+#display_facet_range_date ($field, "News", "datenews")
+
+#*
+#if($response.facetDates)
+    #foreach($field in $response.facetDates)
+    #end
+  #end
+*#
+
+        #*
+      <ul>
+        #foreach($facet in $field.values)
+            <li><a href="#url_for_facet_date_filter($field.name, $facet.name)">$facet.name</a> ($facet.count)</li>
+        #end
+      </ul>
+      *#

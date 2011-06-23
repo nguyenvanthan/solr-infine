@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataConfig>
+ <dataSource type="JdbcDataSource" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/database" user="user" password="password"/>
+
+ <document name="doc">
+ <entity name="jos_content"
+ query="SELECT * FROM matable WHERE state=1"
+ deltaImportQuery="SELECT * FROM matable WHERE tableID='${dataimporter.delta.job_jobs_id}'"
+	deltaQuery="SELECT tableID FROM matable WHERE modified > '${dataimporter.last_index_time}'">
+
+ <field column ="tableID" name="monID" />
+ <field column="tableTexte" name="monTexte" />
+ <field column="rubriqueID" name="rubriqueID" />
+ </entity>
+ </document>
+</dataConfig>

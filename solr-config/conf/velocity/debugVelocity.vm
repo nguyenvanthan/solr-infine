@@ -1,0 +1,18 @@
+$response.response
+-----------------------------------------------------------------------------------------------<br/>
+$response.response.terms<br/>
+$response.response.terms.name<br/>
+-----------------------------------------------------------------------------------------------<br/>
+$response.response.response<br/>
+$response.response.response.start<br/>
+$response.response.response.numFound<br/>
+$response.response.response.docs<br/>
+$response.results<br/>
+***********************************************************************************************<br/>
+#foreach($doc in $response.results)
+#set($v = $doc.getFieldValues('autoCompleteIsin'))
+$v.get(2)<span style="margin-left:30px;">$v.get(0)</span><span style="margin-left:30px;">$v.get(1)</span><br/>
+#end
+
+
+

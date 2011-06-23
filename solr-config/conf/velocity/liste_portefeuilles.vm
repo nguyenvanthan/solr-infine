@@ -1,0 +1,15 @@
+
+    <h2>Portefeuilles</h2>
+    #foreach($doc in $response.results)
+      ##foreach($temp in $doc.listecodeisin)$temp #end   
+      ##set ($tempValue = "")
+      ##$tempValue = #foreach($temp in $doc.listecodeisin)$temp #end
+      <ul>
+            <li><a href="#url_for_facet_portefeuille()#foreach($temp in $doc.listecodeisin)$temp #end&wt=velocity&v.template=browseportefeuille&v.layout=layout">#field('nameportefeuille')</a></li>
+      </ul>
+      
+    #end
+
+
+
+

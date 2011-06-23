@@ -1,0 +1,7 @@
+#foreach($doc in $response.results)
+#set($v = $doc.getFieldValues('autoCompleteIsin'))
+#if ($v)
+<div style="float: left; width: 33%;">$v.get(2)</div><div style="float: left; width: 33%;">$v.get(0)</div><div style="float: right; width: 33%;">$v.get(1)</div>|$v.get(0)
+#end ## -- end if
+#end
+

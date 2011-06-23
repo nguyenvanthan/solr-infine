@@ -1,0 +1,25 @@
+
+	<div id="info" style="height:auto;">
+		<div class="result-title">
+			<b>Nom du portefeuille : #field('nameportefeuille')</b>
+		</div>
+		#set($itemArray = $doc.getFieldValues('listecodeisin'))
+		#if ($itemArray && $itemArray.size() > 0)
+		Valeurs du porteufeuilles : <br/>
+		<ul>
+			#set($includeValues = $itemArray.get(0).split(" "))
+			#foreach($valeurIsin in $includeValues)
+
+			<li>
+				<span>$valeurIsin</span>
+			</li>		
+			#end ## -- end foreach
+		</ul>
+		#end ## -- end if
+	</div>
+
+
+#if($params.getBool("debugQuery",false))
+  <a href="#" onclick='jQuery(this).siblings("pre").toggle(); return false;'>toggle explain</a>
+  <pre style="display:none">$response.getExplainMap().get($doc.getFirstValue('id'))</pre>
+#end

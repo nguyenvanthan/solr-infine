@@ -1,0 +1,14 @@
+#if($response.facetFields)
+    <h2>Portefeuilles</h2>
+    #foreach($field in $response.facetFields)
+      ##if($field.name == "nameportefeuille")
+      ##<span class="facet-field"></span>
+
+      <ul>
+        #foreach($facet in $field.values)
+            <li><a href="#url_for_facet_portefeuille($field.name, $facet.listecodeisin)">$facet.name</a> ($facet.count)</li>
+        #end
+      </ul>
+      ##end  ## end if
+    #end    ## en foreach
+  #end      ## end top if

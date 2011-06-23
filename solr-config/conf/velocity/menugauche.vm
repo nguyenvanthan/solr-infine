@@ -1,0 +1,13 @@
+  <h2>Intruments</h2>
+      <ul>
+            <li><a href="#url_for_solr/browsebysector">Vue par secteurs</a></li>
+      </ul>
+      <ul>
+            <li><a href="#url_for_solr/browseportefeuille">Vue par portefeuille</a></li>
+      </ul>
+ 
+<div>   
+  <h2>Activit&eacute;s r&eacute;centes</h2>
+        #parse('facet_dates.vm')
+
+</div>

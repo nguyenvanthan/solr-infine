@@ -1,0 +1,16 @@
+
+	<div id="info" style="height:auto;">
+		<div class="result-title">
+			<b>Titre : #field('title')</b>
+		</div>
+	  <div>Description : #field('description')</div>
+	  <div>Lien : <a href="#field('link')" target="_blank">#field('link')</a></div>
+	  <div>Code : #field('codeYahoo')</div>
+	  <div>Date : ${date.format('dd/MM/yyyy HH:mm:ss', $!doc.datenews)}</div>
+	</div>
+
+
+#if($params.getBool("debugQuery",false))
+  <a href="#" onclick='jQuery(this).siblings("pre").toggle(); return false;'>toggle explain</a>
+  <pre style="display:none">$response.getExplainMap().get($doc.getFirstValue('id'))</pre>
+#end

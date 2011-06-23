@@ -1,0 +1,14 @@
+#if($response.facetFields)
+    <h2>Secteur d'activit&eacute;</h2>
+    #foreach($field in $response.facetFields)
+      #if($field.name == "secteur")
+      ##<span class="facet-field">Secteur d'activit&eacute;</span>
+
+      <ul>
+        #foreach($facet in $field.values)
+            <li><a href="#url_for_facet_secteur($field.name, $facet.name)">$facet.name</a> ($facet.count)</li>
+        #end
+      </ul>
+      #end  ## end if
+    #end    ## en foreach
+  #end      ## end top if
