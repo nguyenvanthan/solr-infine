@@ -1,0 +1,72 @@
+<config>
+<faqs>
+  <faq id="1" label="Help with Sunspot">
+Sunspot is a Flash based client for Solr 1.3.  The application is designed to be a simple and easy to use
+client which can search and edit a solr index without having to be concerned with posting data via a command line.
+  </faq> 
+  <faq id="2" label="Features">
+     * Configurable for Multiple Solr Servers
+     * View Debug
+     * Template Update and Post
+     * Commit and Optimize functionality
+     * Syntax Highlighted Search
+  </faq> 
+  <faq id="3" label="Configuration">
+     Configuration for sunspot is handled through an xml file pointed to by a javascript variable
+(solrConfigUrl). An example config file is provided with the downloaded package.  You must modify
+the fields and hosts nodes (and optionally the templates for posting) to match your Solr schema.
+  </faq> 
+  <faq id="4" label="Quick Start">
+     If you've made it this far then you have Sunspot installed on your server.
+     Follow the next steps to properly configure it and run it.
+        Step 1: Edit the config.xml file.  Update the hosts nodes to match your solr servers(s).
+        Step 2: Update the fields nodes to match you Solr schema.
+        Step 3: Once you've updated the config.xml file and reloaded your client, you will be able
+                to see your servers in the Server tab.  Select you Solr server and then click the Search tab
+                to begin searching.  Enter your search terms and away you go. 
+  </faq>
+</faqs>
+<templates>
+<template id="1" name="Add">
+  <add>
+    <doc>
+      <field name="id">[id]</field>
+      <field name="url"><![CDATA[[url]]]></field>
+      <field name="title"><![CDATA[[title]]]></field>
+
+      <field name="type">[type]</field>
+    </doc>
+  </add>
+</template>
+<template id="2" name="Update">
+  <add>
+    <doc>
+      <field name="id">[id]</field>
+      <field name="url"><![CDATA[[url]]]></field>
+
+      <field name="title"><![CDATA[[title]]]></field>
+      <field name="type">[type]</field>
+    </doc>
+  </add>
+</template>
+<template id="3" name="Delete">
+  <delete><query>id:[id]</query></delete>
+</template>
+</templates>
+<hosts>
+		<!--
+    <host>http://www.reefkeysoftware.com.com:8080/flex/sunspot/solr/</host>
+    <host>http://www.mysolrservice1.com:8080/solr/</host>
+    <host>http://www.mysolrservice2.com:8080/solr/</host>
+    -->
+    <host>http://localhost:8983/solr/</host>
+</hosts>
+<fields>
+    <field name="score" width="25" status="true"/>
+    <field name="id" width="25" status="true"/>
+    <field name="type" width="20" status="true"/>
+
+    <field name="title" width="100" status="true"/>
+    <field name="url" width="100" status="true"/>
+</fields>
+</config>
