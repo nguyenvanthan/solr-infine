@@ -51,6 +51,8 @@
       );
 *#
     $(document).ready(function(){
+## OLD
+#*
       // fonction d'autocomplete
       $("\#q").autocomplete('#{url_for_solr}/select', {  ## backslash escaped #q as that is a macro defined in VM_global_library.vm
            extraParams:{
@@ -62,6 +64,21 @@
            }
          }
       );
+*#
+      $("\#q").keyup(function () {
+          if ($("\#q").val() != "") {
+              jQuery.ajax({
+                  type: "POST",
+                  url: "http://localhost:8983/solr/select/?q=" + $("\#q").val() + "&wt=velocity&v.template=instant",
+                  success: function(data) {
+                      $("div.results").html(data);
+                    }
+              });
+          } else {
+              $("div.results").html("");
+          }
+      });
+
       
       // fonction pour refresh des cours
       var timer=setInterval(function(){
