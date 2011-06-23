@@ -1,0 +1,12 @@
+#foreach($doc in $response.results)
+<div class="result-document">
+#if($doc.nameportefeuille)
+  #parse("type_portefeuille.vm")
+#elseif($doc.link) 
+  #parse("type_news.vm") 
+#else	
+  #parse("doc.vm")
+#end ## -- end if	
+</div>
+#end
+
