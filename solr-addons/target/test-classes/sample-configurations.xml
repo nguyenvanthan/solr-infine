@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<infinispan xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:infinispan:config:4.0">
+
+   <!-- *************************** -->
+   <!-- System-wide global settings -->
+   <!-- *************************** -->
+
+	<global>
+   		<shutdown hookBehavior="DEFAULT"/>
+	</global>
+
+   <!-- ************************************** -->
+   <!-- Individually configured "named" caches -->
+   <!-- ************************************** -->
+
+	<namedCache name="Local"/>
+	
+   	<namedCache name="LocalTX">
+		<transaction transactionManagerLookupClass="org.infinispan.transaction.lookup.DummyTransactionManagerLookup"/>
+	</namedCache>
+	
+	<namedCache name="CacheStore">
+		<loaders passivation="false" shared="false" preload="true">
+		   <loader class="org.infinispan.loaders.file.FileCacheStore" fetchPersistentState="true"
+		           ignoreModifications="false" purgeOnStartup="false">
+		      <properties>
+		         <property name="location" value="/tmp"/>
+		      </properties>
+		   </loader>
+		</loaders>
+   	</namedCache>
+
+   <namedCache name="Eviction">
+      <eviction wakeUpInterval="500" maxEntries="2" strategy="FIFO"/>
+   </namedCache>
+   <namedCache name="CacheStoreEviction">
+		<loaders passivation="false" shared="false" preload="true">
+		   <loader class="org.infinispan.loaders.file.FileCacheStore" fetchPersistentState="true"
+		           ignoreModifications="false" purgeOnStartup="false">
+		      <properties>
+		         <property name="location" value="/tmp"/>
+		      </properties>
+		   </loader>
+		</loaders>
+      <eviction wakeUpInterval="500" maxEntries="2" strategy="FIFO"/>
+   </namedCache>
+   <namedCache name="ReplicatedTX">
+  	  <clustering mode="replication">
+         <sync replTimeout="20000"/>
+         <stateRetrieval timeout="20000" fetchInMemoryState="true"/>
+      </clustering>
+   </namedCache>
+</infinispan>
