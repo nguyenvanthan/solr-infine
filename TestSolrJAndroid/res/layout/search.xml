@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@android:color/black">
+	
+	<EditText 
+		android:text="@+id/EditText01" 
+		android:id="@+id/EditTextSearchText" 
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content">
+	</EditText>
+	
+	<ImageButton 
+		android:id="@+id/ImageButtonSearchButton" 
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content">
+	</ImageButton>
+	
+	<ListView
+            android:layout_height="wrap_content"
+            android:id="@+id/ListViewResults"
+            android:layout_width="fill_parent"
+            android:divider="?android:attr/listDivider"
+            android:dividerHeight="4px"
+            android:layout_alignParentTop="true">
+    </ListView>
+</LinearLayout>
