@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml"
-				width="725" height="530" minWidth="955" minHeight="600" layout="absolute" creationComplete="initApp()">
+	width="1024" height="800" 
+	minWidth="800" minHeight="800" 
+	layout="absolute" creationComplete="initApp()">
 	
 	<mx:HTTPService id="solr"
-				   url="http://192.168.1.107:8983/solr/select"
-				   resultFormat="text"
-				   result="resultSessionHandler(event)">
+		   url="http://localhost:8983/solr/select"
+		   resultFormat="text"
+		   result="resultSessionHandler(event)">
 		<mx:request xmlns=""> 
 			<q>{recherche.text}</q> 
 			<wt>json</wt>
@@ -15,44 +17,58 @@
 	</mx:HTTPService>
 	
 	<mx:HTTPService id="solrPortefeuille"
-				   url="http://192.168.1.107:8983/solr/select"
-				   resultFormat="text"
-				   result="resultSessionHandlerPortefeuille(event)">
+		   url="http://localhost:8983/solr/select"
+		   resultFormat="text"
+		   result="resultSessionHandlerPortefeuille(event)">
 		<mx:request xmlns=""> 
 			<q>{recherche.text} and type:portefeuille</q> 
 			<wt>json</wt>
-			<rows>50</rows>
+			<rows>10</rows>
 			<sort>type asc</sort>
 			<type>portefeuille</type>
 		</mx:request>  
 	</mx:HTTPService>
 	
 	<mx:HTTPService id="solrPersonnes"
-				   url="http://192.168.1.107:8983/solr/select"
-				   resultFormat="text"
-				   result="resultSessionHandlerPersonne(event)">
+		   url="http://localhost:8983/solr/select"
+		   resultFormat="text"
+		   result="resultSessionHandlerPersonne(event)">
 		<mx:request xmlns=""> 
 			<q>{recherche.text} and type:user</q> 
 			<wt>json</wt>
-			<rows>50</rows>
+			<rows>10</rows>
 			<sort>type asc</sort>
+		</mx:request>  
+	</mx:HTTPService>
+
+	<mx:HTTPService id="solrActions"
+		   url="http://localhost:8983/solr/select"
+		   resultFormat="text"
+		   result="resultSessionHandlerActions(event)">
+		<mx:request xmlns=""> 
+			<q>{recherche.text}</q> 
+			<fq>type:valeur</fq>
+			<wt>json</wt>
+			<rows>10</rows>
+			<sort>alphaNameSort asc</sort>
 		</mx:request>  
 	</mx:HTTPService>
 	
 	<mx:HTTPService id="initSolr"
-				   url="http://192.168.1.107:8983/solr/select"
-				   resultFormat="text"
-				   result="resultSessionHandler(event)">
+		   url="http://localhost:8983/solr/select"
+		   resultFormat="text"
+		   result="resultSessionHandler(event)">
 		<mx:request xmlns=""> 
 			<q>*</q> 
 			<wt>json</wt>
-			<rows>50</rows>
+			<rows>10</rows>
 			<sort>type asc</sort>
 		</mx:request>  
 	</mx:HTTPService>
 	
 	<mx:Script>
 		<![CDATA[
+		
 		import com.adobe.serialization.json.JSON;
 		
 		import mx.collections.ArrayCollection;
@@ -66,6 +82,8 @@
 		private var listPortefeuilles:ArrayCollection;
 		[Bindable]
 		private var listPersonnes:ArrayCollection;
+		[Bindable]
+		private var listActions:ArrayCollection;
 		
 		private function initApp():void
 		{
@@ -108,6 +126,20 @@
 				lblPersonnes.visible = true;
 			}
 		}
+
+		private function resultSessionHandlerActions(event:ResultEvent):void
+		{
+			var object:Object = JSON.decode(event.result as String);
+			
+			listActions = new ArrayCollection(ArrayUtil.toArray(object.response.docs));
+			if (listActions.length == 0) {
+				grid_actions.visible = false;
+				lblActions.visible = false;
+			} else {
+				grid_actions.visible = true;
+				lblActions.visible = true;
+			}
+		}
 		
 		protected function button1_clickHandler(event:MouseEvent):void
 		{
@@ -118,14 +150,18 @@
 		{
 			if (recherche.text != "") {
 
-				resultPanel.visible = true;
+				if (recherche.text.length >= 3){
+
+					resultPanel.visible = true;
 		
-				
-				solrPortefeuille.send();
-				solrPersonnes.send();
+					solrPortefeuille.send();
+					solrPersonnes.send();
+					solrActions.send();
+				}
 			} else {
 				listPortefeuilles.removeAll();
 				listPersonnes.removeAll();
+				listActions.removeAll();
 
 				resultPanel.visible = false;
 	
@@ -139,22 +175,36 @@
 	
 	<mx:TextInput id="recherche" change="recherche_changeHandler(event)" x="555" y="10"/>
 	<mx:Label x="452" y="10" width="95" height="22" fontSize="15" text="Recherche"/>
-	<mx:Panel id="resultPanel" x="389" y="40" width="326" height="436" layout="absolute" headerHeight="0">
+	<mx:Panel id="resultPanel" x="389" y="40" width="326" height="650" layout="absolute" headerHeight="0">
 		<mx:Label id="lblPortefeuilles" x="0" y="0" width="306" height="24" fontSize="15" fontWeight="bold"
 				  text="Portefeuilles" textAlign="center"/>
 		<mx:DataGrid id="grid_portefeuilles" dataProvider="{listPortefeuilles}" headerHeight="0" x="0" y="32" width="306" height="170">
 			<mx:columns>
+				<!--
 				<mx:DataGridColumn dataField="id" headerText="name" width="100"/>
+				-->
 				<mx:DataGridColumn dataField="nameportefeuille" headerText="isin" width="100"/>
 			</mx:columns>
 		</mx:DataGrid>
+
 		<mx:Label id="lblPersonnes" x="0" y="210" width="306" height="27" fontSize="15" fontWeight="bold"
 				  text="Personnes" textAlign="center"/>
 		<mx:DataGrid id="grid_personnes" dataProvider="{listPersonnes}" headerHeight="0" x="0" y="245">
 			<mx:columns>
 				<mx:DataGridColumn dataField="prefix" headerText="name" width="100"/>
-				<mx:DataGridColumn dataField="prenom" headerText="isin" width="100"/>
-				<mx:DataGridColumn dataField="nom" headerText="isin" width="100"/> 
+				<mx:DataGridColumn dataField="prenom" headerText="prenom" width="100"/>
+				<mx:DataGridColumn dataField="nom" headerText="nom" width="100"/> 
+			</mx:columns>
+		</mx:DataGrid>
+
+		<mx:Label id="lblActions" x="0" y="410" width="306" height="27" fontSize="15" fontWeight="bold"
+				  text="Valeurs" textAlign="center"/>
+		
+		<mx:DataGrid id="grid_actions" dataProvider="{listActions}" headerHeight="0" x="0" y="445">
+			<mx:columns>
+				<mx:DataGridColumn dataField="isin" headerText="code isin" width="100"/>
+				<mx:DataGridColumn dataField="name" headerText="name" width="100"/>
+				<mx:DataGridColumn dataField="secteur" headerText="secteur" width="100"/> 
 			</mx:columns>
 		</mx:DataGrid>
 	</mx:Panel>
