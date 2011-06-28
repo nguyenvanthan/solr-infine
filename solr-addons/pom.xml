@@ -2,12 +2,16 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.infine.solr</groupId>
   <artifactId>solr-addons</artifactId>
-  <version>1.1.1</version>
+  <version>1.1.3</version>
   <name>Solr addons</name>
   <description>Addons for Solr</description>
   
   
-	<build>
+  <organization>
+  	<name>In Fine Group</name>
+  	<url>http://www.infineconsulting.com</url>
+  </organization>
+  <build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -30,6 +34,13 @@
 			</plugin>
 		</plugins>
 	</build>
+	
+	<repositories>
+		<repository>
+		 	<id>Java.Net</id>
+		  	<url>http://download.java.net/maven/2/</url>
+		</repository>
+	</repositories>
 
 	<dependencies>
 		<dependency>
@@ -42,6 +53,15 @@
 			<artifactId>solr-core</artifactId>
 			<version>3.1.0</version>
 		</dependency>
+		<dependency>
+ 			<groupId>javaee</groupId>
+    		<artifactId>javaee-api</artifactId>
+		   	<version>5</version>
+		   	<scope>provided</scope>
+		</dependency>
 	</dependencies>
+	
+
+	
   
 </project>

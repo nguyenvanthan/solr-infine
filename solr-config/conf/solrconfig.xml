@@ -64,6 +64,7 @@
               <lib dir="./lib" />
     -->
  
+  <lib dir="./lib" />
   
   <!-- A dir option by itself adds any files found in the directory to
        the classpath, this is useful for including all jars in a
@@ -721,6 +722,9 @@
        <str name="spellcheck.extendedResults">false</str>
        <str name="spellcheck.count">10</str>
      </lst>
+     <arr name="first-components">
+	     <str>actionfilter</str>
+     </arr>
   </requestHandler>
   
   <requestHandler name="search" class="solr.SearchHandler">
@@ -794,7 +798,7 @@
       -->
 		
      <arr name="last-components">
-	<str>userfilter</str>
+	     <str>userfilter</str>
         <str>spellcheck</str>
      </arr>
     </requestHandler>
@@ -1331,9 +1335,10 @@
        
      -->
 
-   <!-- Custom User Filter Component -->
+   <!-- Custom Search Component -->
 
-   <searchComponent name="userfilter" class="com.infine.component.UserFilterComponent"/>	
+   <searchComponent name="actionfilter" class="com.infine.solr.component.ActionFilterComponent"/>	
+   <searchComponent name="userfilter" class="com.infine.solr.component.UserFilterComponent"/>	
 
    <!-- Spell Check
 
