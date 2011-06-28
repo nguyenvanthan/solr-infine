@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600" creationComplete="initApp()">
+	<fx:Declarations>
+		<s:HTTPService id="solr"
+					   url="http://192.168.1.107:8983/solr/select"
+					   resultFormat="text"
+					   result="resultSessionHandler(event)">
+			<mx:request xmlns=""> 
+				<q>{recherche.text}</q> 
+				<wt>json</wt>
+				<rows>50</rows>
+				<sort>type asc</sort>
+			</mx:request>  
+		</s:HTTPService>
+		
+		<s:HTTPService id="solrPortefeuille"
+					   url="http://192.168.1.107:8983/solr/select"
+					   resultFormat="text"
+					   result="resultSessionHandlerPortefeuille(event)">
+			<mx:request xmlns=""> 
+				<q>{recherche.text} and type:portefeuille</q> 
+				<wt>json</wt>
+				<rows>50</rows>
+				<sort>type asc</sort>
+				<type>portefeuille</type>
+			</mx:request>  
+		</s:HTTPService>
+		
+		<s:HTTPService id="solrPersonnes"
+					   url="http://192.168.1.107:8983/solr/select"
+					   resultFormat="text"
+					   result="resultSessionHandlerPersonne(event)">
+			<mx:request xmlns=""> 
+				<q>{recherche.text} and type:user</q> 
+				<wt>json</wt>
+				<rows>50</rows>
+				<sort>type asc</sort>
+			</mx:request>  
+		</s:HTTPService>
+		
+		<s:HTTPService id="initSolr"
+					   url="http://192.168.1.107:8983/solr/select"
+					   resultFormat="text"
+					   result="resultSessionHandler(event)">
+			<mx:request xmlns=""> 
+				<q>*</q> 
+				<wt>json</wt>
+				<rows>50</rows>
+				<sort>type asc</sort>
+			</mx:request>  
+		</s:HTTPService>
+		
+		
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.adobe.serialization.json.JSON;
+			
+			import mx.collections.ArrayCollection;
+			import mx.collections.IViewCursor;
+			import mx.rpc.events.ResultEvent;
+			import mx.utils.ArrayUtil;
+
+			[Bindable]
+			private var list:ArrayCollection;
+			[Bindable]
+			private var listPortefeuilles:ArrayCollection;
+			[Bindable]
+			private var listPersonnes:ArrayCollection;
+			
+			private function initApp():void
+			{
+				initSolr.send();
+				
+				grid_portefeuilles.visible = false;
+				grid_personnes.visible = false;
+				lbl1.visible = false;
+				lbl2.visible = false;
+				panel.visible = false;
+			}
+			
+			private function resultSessionHandler(event:ResultEvent):void
+			{
+				var object:Object = JSON.decode(String(event.result));
+				list = new ArrayCollection(ArrayUtil.toArray(object.response.docs));
+				
+			}
+			
+			private function resultSessionHandlerPortefeuille(event:ResultEvent):void
+			{
+				var object:Object = JSON.decode(String(event.result));
+				
+				listPortefeuilles = new ArrayCollection(ArrayUtil.toArray(object.response.docs));
+			}
+			
+			private function resultSessionHandlerPersonne(event:ResultEvent):void
+			{
+				var object:Object = JSON.decode(String(event.result));
+				
+				listPersonnes = new ArrayCollection(ArrayUtil.toArray(object.response.docs));
+			}
+			
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				solr.send();
+			}
+			
+			protected function recherche_changeHandler(event:Event):void
+			{
+				if (recherche.text != "") {
+					grid_portefeuilles.visible = true;
+					grid_personnes.visible = true;
+					lbl1.visible = true;
+					lbl2.visible = true;
+					panel.visible = true;
+					
+					solrPortefeuille.send();
+					solrPersonnes.send();
+				} else {
+					listPortefeuilles.removeAll();
+					listPersonnes.removeAll();
+					
+					grid_portefeuilles.visible = false;
+					grid_personnes.visible = false;
+					lbl1.visible = false;
+					lbl2.visible = false;
+					panel.visible = false;
+				}
+				
+			}
+			
+			
+		]]>
+	</fx:Script>
+	<s:Panel x="0" y="0" id="panel_top" width="955" height="50">
+		<s:TextInput id="recherche" x="731" y="-15" width="212" change="recherche_changeHandler(event)"/>
+		<s:Label x="624" y="-15" width="105" height="22" fontSize="17" text="Recherche"
+				 verticalAlign="middle"/>
+		<s:Panel id="panel" x="554" y="10" width="389" height="518">
+		</s:Panel>
+	</s:Panel>
+	<mx:DataGrid id="grid_portefeuilles" dataProvider="{listPortefeuilles}" headerHeight="0" verticalGridLines="false" borderVisible="false" x="558" y="75" width="387" height="202">
+		<mx:columns>
+			<mx:DataGridColumn dataField="id" headerText="name" width="100"/>
+			<mx:DataGridColumn dataField="nameportefeuille" headerText="isin" width="100"/>
+		</mx:columns>
+	</mx:DataGrid>
+	<s:Label id="lbl1" x="556" y="42" width="389" height="25" fontSize="15" fontWeight="bold"
+			 text="Portefeuilles" textAlign="center" verticalAlign="middle"/>
+	<s:Label id="lbl2" x="556" y="280" width="389" height="31" fontSize="15" fontWeight="bold" text="Personnes"
+			 textAlign="center" verticalAlign="middle"/>
+	<mx:DataGrid id="grid_personnes" dataProvider="{listPersonnes}" headerHeight="0" verticalGridLines="false" borderVisible="false" x="556" y="315" width="389" height="200">
+		<mx:columns>
+			<mx:DataGridColumn dataField="prefix" headerText="name" width="100"/>
+			<mx:DataGridColumn dataField="prenom" headerText="isin" width="100"/>
+			<mx:DataGridColumn dataField="nom" headerText="isin" width="100"/> 
+		</mx:columns>
+	</mx:DataGrid>
+</s:Application>

@@ -1,0 +1,18 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+
+
+#panel_top
+{
+	chrome-color: #779EB7;
+	background-color: #779EB7;
+}
+global
+{
+	vertical-align: middle;
+	text-align: center;
+	font-size: 15;
+	font-weight: bold;
+}
+	

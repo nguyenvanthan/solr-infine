@@ -80,7 +80,8 @@
       });
 
       
-      // fonction pour refresh des cours
+      // fonction pour refresh des cours a partir de coherence
+     #*	
       var timer=setInterval(function(){
           $("div#info input#cours").each(function(){
                 //var input = $(this); // This is the jquery object of the input, do what you will
@@ -89,6 +90,7 @@
                 loadCours(id,$(this));
           });
       }, 1000);
+     *#
       
       
 

@@ -253,6 +253,40 @@
       </analyzer>
     </fieldType>
 
+    <fieldType name="textNGram" class="solr.TextField" positionIncrementGap="100" autoGeneratePhraseQueries="true">
+      <analyzer type="index">
+        <!--<tokenizer class="solr.WhitespaceTokenizerFactory"/>-->
+	<tokenizer class="solr.EdgeNGramTokenizerFactory" minGramSize="3" maxGramSize="12"/>
+        <filter class="solr.WordDelimiterFilterFactory" 
+		generateWordParts="1" generateNumberParts="1" 
+		catenateWords="1" catenateNumbers="1" catenateAll="0" 
+		splitOnCaseChange="0" splitOnNumerics="0"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+      <analyzer type="query">
+        <!--<tokenizer class="solr.WhitespaceTokenizerFactory"/>-->
+	<tokenizer class="solr.EdgeNGramTokenizerFactory" minGramSize="3" maxGramSize="12"/>
+        <filter class="solr.WordDelimiterFilterFactory" 
+		generateWordParts="1" generateNumberParts="1" 
+		catenateWords="1" catenateNumbers="1" catenateAll="0" 
+		splitOnCaseChange="0" splitOnNumerics="0"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+    </fieldType>
+
+    <fieldType name="textNGram2" class="solr.TextField" positionIncrementGap="100" autoGeneratePhraseQueries="true">
+      <analyzer type="index">
+	<tokenizer class="solr.EdgeNGramTokenizerFactory" minGramSize="3" maxGramSize="12"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+      <analyzer type="query">
+	<tokenizer class="solr.EdgeNGramTokenizerFactory" minGramSize="3" maxGramSize="12"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+    </fieldType>
+
+
+
 
     <!-- Less flexible matching, but less false matches.  Probably not ideal for product names,
          but may be good for SKUs.  Can insert dashes in the wrong place and still match. -->
@@ -498,9 +532,9 @@
 
    <!-- general -->
    <field name="type" type="string" indexed="true" stored="false"/>
-   <field name="name" type="text" indexed="true" stored="true"/>
+   <field name="name" type="textNGram2" indexed="true" stored="true" multiValued="true"/>
    <field name="alphaNameSort" type="alphaOnlySort" indexed="true" stored="false"/>
-   <field name="isin" type="text" indexed="true" stored="true"/>
+   <field name="isin" type="textNGram2" indexed="true" stored="true" multiValued="true"/>
    <field name="users"  type="text_ws" indexed="true" stored="false" multiValued="true"/>
    <field name="groups"  type="text_ws" indexed="true" stored="false" multiValued="true"/>
    

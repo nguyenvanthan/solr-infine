@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600" creationComplete="initApp()">
+	<fx:Declarations>
+		<s:HTTPService id="solr"
+					   url="http://192.168.1.107:8983/solr/select"
+					   resultFormat="text"
+					   result="resultSessionHandler(event)">
+			<mx:request xmlns=""> 
+				<q>{recherche.text}</q> 
+				<wt>json</wt>
+				<rows>50</rows>
+				<sort>type asc</sort>
+			</mx:request>  
+		</s:HTTPService>
+		
+		<s:HTTPService id="initSolr"
+					   url="http://192.168.1.107:8983/solr/select"
+					   resultFormat="text"
+					   result="resultSessionHandler(event)">
+			<mx:request xmlns=""> 
+				<q>*</q> 
+				<wt>json</wt>
+				<rows>50</rows>
+				<sort>type asc</sort>
+			</mx:request>  
+		</s:HTTPService>
+		
+		
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.adobe.serialization.json.JSON;
+			
+			import mx.collections.ArrayCollection;
+			import mx.collections.IViewCursor;
+			import mx.rpc.events.ResultEvent;
+			import mx.utils.ArrayUtil;
+
+			[Bindable]
+			private var list:ArrayCollection;
+			
+			private function initApp():void
+			{
+				initSolr.send();
+			}
+			
+			private function resultSessionHandler(event:ResultEvent):void
+			{
+				var object:Object = JSON.decode(String(event.result));
+				list = new ArrayCollection(ArrayUtil.toArray(object.response.docs));
+				
+				trace(String(event.result));
+			}
+			
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				solr.send();
+			}
+			
+			protected function recherche_changeHandler(event:Event):void
+			{
+				if (recherche.text != "") {
+					solr.send();
+				} else {
+					list.removeAll();
+				}
+				
+			}
+			
+			
+		]]>
+	</fx:Script>
+	<mx:DataGrid id="datagrid" x="0" y="53" width="955" height="547" dataProvider="{list}"
+				 paddingLeft="20">
+		<mx:columns>
+			<mx:DataGridColumn dataField="name" headerText="name" width="100"/>
+			<mx:DataGridColumn dataField="id" headerText="isin" width="100"/>
+			<mx:DataGridColumn dataField="isin" headerText="isin" width="100"/> 
+			<mx:DataGridColumn dataField="type" headerText="type" width="100"/>
+		</mx:columns>
+	</mx:DataGrid>
+	<s:TextInput id="recherche" x="10" y="10" width="206" height="24" change="recherche_changeHandler(event)"/>
+	<s:Button x="224" y="10" width="75" height="25" label="Button"
+			  click="button1_clickHandler(event)"/>
+</s:Application>
