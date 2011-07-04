@@ -21,31 +21,50 @@
   ~ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
+  <!-- 
 <infinispan
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xsi:schemaLocation="urn:infinispan:config:4.0 http://www.infinispan.org/schemas/infinispan-config-4.0.xsd"
-   xmlns="urn:infinispan:config:4.0">
+   xsi:schemaLocation="urn:infinispan:config:4.2 http://www.infinispan.org/schemas/infinispan-config-4.2.xsd"
+   xmlns="urn:infinispan:config:4.2">
+   -->
+<infinispan
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="urn:infinispan:config:5.0 http://www.infinispan.org/schemas/infinispan-config-5.0.xsd"
+      xmlns="urn:infinispan:config:5.0">   
 
    <global>
-      <transport clusterName="solrCluster"/>
       <globalJmxStatistics enabled="true" allowDuplicateDomains="true"/>
+      <transport clusterName="solrCluster" distributedSyncTimeout="60000">
+
+		<!-- 
+      	<properties>
+      		<property name="configurationFile" value="jgroups-tcp.xml" />
+      	</properties>
+      	-->
+
+      </transport>
    </global>
 
    <default>
       <jmxStatistics enabled="true"/>
+      <!-- <locking isolationLevel="NONE"/>-->
+      <!-- <transaction transactionManagerLookupClass="org.infinispan.transaction.lookup.GenericTransactionManagerLookup"-->
+      <transaction transactionManagerLookupClass="org.infinispan.transaction.lookup.JBossStandaloneJTAManagerLookup"
+				syncRollbackPhase="false"
+				syncCommitPhase="true"
+				useEagerLocking="true" eagerLockSingleNode="true"/>
       <clustering mode="distribution">
          <l1 enabled="true" lifespan="60000" />
          <hash numOwners="2" rehashRpcTimeout="120000" />
          <sync />
+         <stateRetrieval timeout="60000"/>
       </clustering>
       <invocationBatching enabled="true" />
    </default>
+   
+   <namedCache name="solr"/>
 
    <namedCache name="cours">
-   	 <transaction transactionManagerLookupClass="org.infinispan.transaction.lookup.GenericTransactionManagerLookup"
-				syncRollbackPhase="false"
-				syncCommitPhase="true"
-				useEagerLocking="true"/>
      <clustering mode="replication">
          <sync replTimeout="60000"/>
          <stateRetrieval timeout="60000" fetchInMemoryState="false"/>
