@@ -34,14 +34,12 @@
 
    <global>
       <globalJmxStatistics enabled="true" allowDuplicateDomains="true"/>
-      <transport clusterName="solrCluster" distributedSyncTimeout="60000">
-
+      <transport clusterName="solrCluster" distributedSyncTimeout="60000" >
 		<!-- 
       	<properties>
       		<property name="configurationFile" value="jgroups-tcp.xml" />
       	</properties>
       	-->
-
       </transport>
    </global>
 

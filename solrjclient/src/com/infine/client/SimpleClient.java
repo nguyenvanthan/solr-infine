@@ -48,6 +48,7 @@ public class SimpleClient {
 	
 //	private static final String LOCALHOST_SOLR = "http://192.168.56.101:8983/solr";
 	private static final String LOCALHOST_SOLR = "http://localhost:8983/solr";
+//	private static final String LOCALHOST_SOLR = "http://localhost:8080/solr";
 
 	private static int MAX_ROWS = 1000000;
 	

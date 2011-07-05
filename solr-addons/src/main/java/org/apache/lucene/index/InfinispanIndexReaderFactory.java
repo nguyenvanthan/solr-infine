@@ -11,8 +11,7 @@ import org.infinispan.lucene.InfinispanDirectory;
 
 public class InfinispanIndexReaderFactory extends IndexReaderFactory {
 	
-	private static Map<String, ReadDirectoryReader> readDirectoryReaders = new ConcurrentHashMap<String, ReadDirectory>();
-
+	private static Map<String, ReadDirectoryReader> readDirectoryReaders = new ConcurrentHashMap<String, ReadDirectoryReader>();
 	private class ReadDirectoryReader {
 		Directory directory;
 		SegmentInfos infos;
