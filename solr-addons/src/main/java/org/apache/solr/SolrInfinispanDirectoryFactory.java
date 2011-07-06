@@ -2,8 +2,6 @@ package org.apache.solr;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.lucene.index.IndexFileNameFilter;
 import org.apache.lucene.store.Directory;
@@ -14,31 +12,34 @@ import org.infinispan.lucene.locking.TransactionalLockFactory;
 import org.infinispan.lucene.readlocks.DistributedSegmentReadLocker;
 import org.infinispan.manager.DefaultCacheManager;
 import org.infinispan.manager.EmbeddedCacheManager;
-
+@SuppressWarnings({"unchecked","rawtypes"})
 public class SolrInfinispanDirectoryFactory extends StandardDirectoryFactory {
 
 	private static final String INDEX_NAME = "solr";
+
+	private static final String DIRECTORIES_CACHE = "directories";
 
 	public static final String CONFIG_FILE = "solr-config-file.xml";
 	
 	public final static int SEGMENT_SIZE = 32 * 1024;
 
-	private static Map<String, InfinispanDirectory> directories = new HashMap<String, InfinispanDirectory>();
+//	private static Map<String, InfinispanDirectory> directories = new HashMap<String, InfinispanDirectory>();
 	
-	//private EmbeddedCacheManager manager;
+	private EmbeddedCacheManager manager = null;
 	
 	private EmbeddedCacheManager getManagerInstance() {
-		System.out.println("---------------------------------------------------------------");
-		System.out.println("------------   INITIALIZE OF THE CACHE MANAGER     ------------");
-		EmbeddedCacheManager manager = null;
-		try {
-			manager = new DefaultCacheManager(CONFIG_FILE);
-			System.out.println(" --> SUCCESS");
-		} catch (IOException e) {
-			System.out.println(" --> FAILED");
-			e.printStackTrace();
+		if (manager == null){
+			System.out.println("---------------------------------------------------------------");
+			System.out.println("------------   INITIALIZE OF THE CACHE MANAGER     ------------");
+			try {
+				manager = new DefaultCacheManager(CONFIG_FILE);
+				System.out.println(" --> SUCCESS");
+			} catch (IOException e) {
+				System.out.println(" --> FAILED");
+				e.printStackTrace();
+			}
+			System.out.println("---------------------------------------------------------------");
 		}
-		System.out.println("---------------------------------------------------------------");
 		return manager;
 	}
 
@@ -49,10 +50,12 @@ public class SolrInfinispanDirectoryFactory extends StandardDirectoryFactory {
 			System.out.println("PATH : " + path);
 			System.out.println("---------------------------------------------------------------------------------------------");
 //			SolrInfinispanDirectory directory = directories.get(path);
-			InfinispanDirectory directory = directories.get(path);
+//			InfinispanDirectory directory = directories.get(path);
+			InfinispanDirectory directory = getDirectoryFromCache( path);
 			if (directory == null) {
 				directory = (InfinispanDirectory) openNew(path);
-				directories.put(path, directory);
+				//directories.put(path, directory);
+				putDirectoryToCache(path, directory);
 			}
 			return directory;
 		}
@@ -62,7 +65,8 @@ public class SolrInfinispanDirectoryFactory extends StandardDirectoryFactory {
 	public boolean exists(String path) {
 		synchronized (SolrInfinispanDirectoryFactory.class) {
 //			SolrInfinispanDirectory directory = directories.get(path);
-			InfinispanDirectory directory = directories.get(path);
+//			InfinispanDirectory directory = directories.get(path);
+			InfinispanDirectory directory = getDirectoryFromCache( path);
 			if (directory == null) {
 				return false;
 			} else {
@@ -74,7 +78,7 @@ public class SolrInfinispanDirectoryFactory extends StandardDirectoryFactory {
 	/**
 	 * Non-public for unit-test access only. Do not use directly
 	 */
-	@SuppressWarnings("unchecked")
+
 	Directory openNew(String path) throws IOException {
 		// Directory directory = new SolrInfinispanDirectory();
 		EmbeddedCacheManager manager = getManagerInstance();
@@ -101,6 +105,18 @@ public class SolrInfinispanDirectoryFactory extends StandardDirectoryFactory {
 		return directory;
 	}
 
+	private void putDirectoryToCache(String path, InfinispanDirectory directory){
+		EmbeddedCacheManager manager = getManagerInstance();
+		Cache cache = manager.getCache(DIRECTORIES_CACHE);
+		cache.put(path, directory);
+	}
+
+	private InfinispanDirectory getDirectoryFromCache(String path){
+		EmbeddedCacheManager manager = getManagerInstance();
+		Cache cache = manager.getCache(DIRECTORIES_CACHE);
+		return (InfinispanDirectory) cache.get(path);
+	}
+	
 	
 
 }

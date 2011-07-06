@@ -62,7 +62,7 @@
    
    <namedCache name="solr"/>
 
-   <namedCache name="cours">
+   <namedCache name="directories">
      <clustering mode="replication">
          <sync replTimeout="60000"/>
          <stateRetrieval timeout="60000" fetchInMemoryState="false"/>

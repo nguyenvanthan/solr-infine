@@ -94,6 +94,20 @@ public class ConnexionTest2 {
 	}
 	
 	@Test
+	public void getDirectoryFromCache() throws InterruptedException, IOException {
+		
+		EmbeddedCacheManager manager = new DefaultCacheManager("solr-config-file.xml");
+		Cache cache = manager.getCache("directories");
+		for (Object element : cache.keySet()) {
+			Object o = cache.get(element);
+			System.out.println(o.getClass().getName());
+			System.out.println(o);
+			System.out.println("-----------------------------------------------------------------------");
+		}
+		
+	}
+	
+	@Test
 	public void resetCache() throws InterruptedException,
 	IOException {
 		
