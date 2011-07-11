@@ -2,6 +2,8 @@ package org.apache.solr;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.lucene.index.IndexFileNameFilter;
 import org.apache.lucene.store.Directory;
@@ -15,17 +17,17 @@ import org.infinispan.manager.EmbeddedCacheManager;
 @SuppressWarnings({"unchecked","rawtypes"})
 public class SolrInfinispanDirectoryFactory extends StandardDirectoryFactory {
 
-	private static final String INDEX_NAME = "solr";
+	protected static final String INDEX_NAME = "solr";
 
-	private static final String DIRECTORIES_CACHE = "directories";
+	protected static final String DIRECTORIES_CACHE = "directories";
 
-	public static final String CONFIG_FILE = "solr-config-file.xml";
+	protected static final String CONFIG_FILE = "solr-config-file.xml";
 	
-	public final static int SEGMENT_SIZE = 32 * 1024;
+	protected static final int SEGMENT_SIZE = 32 * 1024;
 
-//	private static Map<String, InfinispanDirectory> directories = new HashMap<String, InfinispanDirectory>();
+	private static Map<String, InfinispanDirectory> directories = new HashMap<String, InfinispanDirectory>();
 	
-	private EmbeddedCacheManager manager = null;
+	protected EmbeddedCacheManager manager = null;
 	
 	private EmbeddedCacheManager getManagerInstance() {
 		if (manager == null){
@@ -49,13 +51,10 @@ public class SolrInfinispanDirectoryFactory extends StandardDirectoryFactory {
 			System.out.println("---------------------------------------------------------------------------------------------");
 			System.out.println("PATH : " + path);
 			System.out.println("---------------------------------------------------------------------------------------------");
-//			SolrInfinispanDirectory directory = directories.get(path);
-//			InfinispanDirectory directory = directories.get(path);
-			InfinispanDirectory directory = getDirectoryFromCache( path);
+			InfinispanDirectory directory = directories.get(path);
 			if (directory == null) {
 				directory = (InfinispanDirectory) openNew(path);
-				//directories.put(path, directory);
-				putDirectoryToCache(path, directory);
+				directories.put(path, directory);
 			}
 			return directory;
 		}
@@ -64,9 +63,7 @@ public class SolrInfinispanDirectoryFactory extends StandardDirectoryFactory {
 	@Override
 	public boolean exists(String path) {
 		synchronized (SolrInfinispanDirectoryFactory.class) {
-//			SolrInfinispanDirectory directory = directories.get(path);
-//			InfinispanDirectory directory = directories.get(path);
-			InfinispanDirectory directory = getDirectoryFromCache( path);
+			InfinispanDirectory directory = directories.get(path);
 			if (directory == null) {
 				return false;
 			} else {
@@ -104,19 +101,5 @@ public class SolrInfinispanDirectoryFactory extends StandardDirectoryFactory {
 		}
 		return directory;
 	}
-
-	private void putDirectoryToCache(String path, InfinispanDirectory directory){
-		EmbeddedCacheManager manager = getManagerInstance();
-		Cache cache = manager.getCache(DIRECTORIES_CACHE);
-		cache.put(path, directory);
-	}
-
-	private InfinispanDirectory getDirectoryFromCache(String path){
-		EmbeddedCacheManager manager = getManagerInstance();
-		Cache cache = manager.getCache(DIRECTORIES_CACHE);
-		return (InfinispanDirectory) cache.get(path);
-	}
-	
-	
 
 }
