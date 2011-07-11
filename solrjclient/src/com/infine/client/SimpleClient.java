@@ -279,6 +279,7 @@ public class SimpleClient {
 			CommonsHttpSolrServer solr = new CommonsHttpSolrServer(LOCALHOST_SOLR);
 			long start = System.nanoTime();
 			solr.optimize();
+			solr.commit();
 			long tempsExecution = System.nanoTime() - start;
 			printTime(tempsExecution);
 		} catch (SolrServerException e) {
@@ -289,6 +290,22 @@ public class SimpleClient {
 			
 	}
 	
+	@Test
+	public void optimizeIndexAndCommitCore1(){
+		try {
+			CommonsHttpSolrServer solr = new CommonsHttpSolrServer(LOCALHOST_SOLR + "/core1");
+			long start = System.nanoTime();
+			solr.optimize();
+			solr.commit();
+			long tempsExecution = System.nanoTime() - start;
+			printTime(tempsExecution);
+		} catch (SolrServerException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+			
+	}
 	
 	@Test
 	public void feedIndex2(){
@@ -450,6 +467,40 @@ public class SimpleClient {
 	}
 	
 	@Test
+	public void feedStockIndexCore1(){
+		try {
+			CommonsHttpSolrServer solr = new CommonsHttpSolrServer(LOCALHOST_SOLR +  "/core1");
+			List<Stock> listeStocks = generateStockList();
+			int buffer = 1000;
+			int nbstocks = listeStocks.size();
+			System.out.println("Nombre d'objets : "+nbstocks);
+			long start = System.nanoTime();
+			List<Stock> tempList = null;
+			while (listeStocks != null && listeStocks.size() > 0){
+				int max = listeStocks.size();
+				if (buffer < max){
+					tempList = listeStocks.subList(0, buffer);
+				}else {
+					tempList = listeStocks.subList(0, max);
+				}
+				solr.addBeans(tempList);
+				tempList.clear();
+				System.out.print(".");
+			}
+			
+			// enfin on commit
+			solr.commit();
+			
+			long tempsExecution = System.nanoTime() - start;
+			printTime(tempsExecution);
+		} catch (SolrServerException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
 	public void feedStockIndex(){
 		try {
 			CommonsHttpSolrServer solr = new CommonsHttpSolrServer(LOCALHOST_SOLR);
@@ -535,6 +586,26 @@ public class SimpleClient {
 			e.printStackTrace();
 		}
 
+	}
+	
+	@Test
+	public void mergeIndexes(){
+		CommonsHttpSolrServer solr;
+		try {
+			solr = new CommonsHttpSolrServer(LOCALHOST_SOLR);
+			long start = System.nanoTime();
+			CoreAdminResponse carp = CoreAdminRequest.mergeIndexes("solr", new String[] {"G:\\Developpement\\BOULOT\\apache-solr-3.1.0\\example\\multiindexes\\data/index"}, solr);
+			long tempsExecution = System.nanoTime() - start;
+			printTime(tempsExecution);
+			
+			System.out.println("CoreAdminResponse : " + carp.getResponse().toString());
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (SolrServerException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	
